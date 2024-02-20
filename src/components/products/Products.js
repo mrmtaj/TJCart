@@ -1,0 +1,137 @@
+import React, { useState, useEffect } from "react";
+import { useParams } from 'react-router-dom';
+import Pagination from "../commons/Pagination";
+
+import { Capitalize } from "../commons/Utilities";
+
+import Product from "./Product";
+import {useProductFilter} from '../../context/ProductContext';
+
+
+const Products = () => {
+const {cat} = useParams();
+
+
+const [currentPage, setCurrentPage] = useState(1);
+const [recordsPerPage] = useState(4);
+
+
+const [products, setProducts] = useState([]);
+
+const {productFilter : {sort, searchQry}, productFilterDispatch } = useProductFilter();
+
+        
+useEffect(() => {
+  let xURL = `https://dummyjson.com/products?limit=300`;
+  if (cat != null ) xURL = `https://dummyjson.com/products/category/${cat}`;
+  
+  fetch(xURL)
+  .then((response) => response.json())
+  .then((x) => { setProducts(x);setCurrentPage(1)})
+  .catch((err) => { console.log(err.message);});
+},[cat]);
+
+function handleOnChange(e){
+	
+	productFilterDispatch({
+		type: "SORT_BY_PRICE",
+		payload: e.target.value,
+	  });
+			
+}
+
+
+const transformProducts = () =>{
+
+ let sortedProducts =  products.products;
+ 
+	if (sort) {
+		sortedProducts = sortedProducts.sort((a, b) =>
+		sort === "lowToHigh" ? a.price - b.price : b.price - a.price  
+		);
+	}
+
+	if (searchQry) {
+		console.log("gere", searchQry);
+		sortedProducts = sortedProducts.filter((prod) =>
+		prod.title.toLowerCase().includes(searchQry)
+		);
+	}
+
+ 	return sortedProducts;
+}
+
+
+	const lastRecordIndex = currentPage * recordsPerPage;
+    const firstRecordIndex = lastRecordIndex - recordsPerPage;
+	const currentProducts = products.products && transformProducts().slice(firstRecordIndex, lastRecordIndex);
+
+
+	return (
+    
+	<>
+	
+	
+	<nav className="breadcrumb container">
+		  <a className="breadcrumb-item" href="/">Home</a>
+		  <a className="breadcrumb-item" href="/products">Products</a>
+		  <span className="breadcrumb-item active">{cat && Capitalize(cat)}</span>
+		</nav>
+
+	<div className="container">
+
+		<div className="row">
+		
+			<aside className="col-3">
+			
+			<h4>Filter by price</h4>
+			
+			</aside>
+			
+			<section className="col-9 products">
+				<h2>{cat && Capitalize(cat)}</h2>
+				
+				<div className="row">
+					<div className="col-9"></div>
+					<div className="col ml-auto mb-3">
+						<select className="form-control" value={sort} onChange={handleOnChange}>
+						<option value="lowToHigh">Price: Low to High</option>
+						<option value="highToLow">Price: High to Low</option>
+						</select>
+					</div>
+				</div>
+				<div className="row">
+					{ currentProducts !=null && currentProducts.map ((prod,index) =>    
+						(
+							<div className="col-md-3" key={index}>
+								<Product prod={prod} />
+							</div> 
+						)
+					)}
+				</div>
+
+				<Pagination
+                totalRecords={products.products && transformProducts().length}
+                recordsPerPage={recordsPerPage}
+                setCurrentPage={setCurrentPage}
+                currentPage={currentPage}
+				pageLink= {cat !=null ? `/products/${cat}` : "/products" }
+				/>
+		
+		
+			</section> 
+			
+			
+		
+		</div>
+    </div>
+
+	</>
+    
+
+
+
+  )
+}
+
+export default Products
