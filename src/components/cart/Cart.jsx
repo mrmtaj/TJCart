@@ -1,19 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import {Link} from 'react-router-dom';
 
-import {useCart} from '../../context/CartContext';
+
+import { useSelector, useDispatch } from 'react-redux';
+import {  clearCart } from '../../redux/cartSlice';
 
 import CartItem from './CartItem';
+
+import { formatAmount } from '../../utilities/Helper';
+
+
+
 
 
 const Cart = () => {
 
-      const {cart, UpdateCartItemQty, removeFromCart, clearCart} = useCart();
+   
+      const { cart } = useSelector(state => state.cart);
+      const dispatch= useDispatch();
 
-      const [total, setTotal] = useState();
+      const [total, setTotal] = useState(0);
+    
 
      useEffect(()=>{
-        setTotal(cart.reduce((acc,curr) => acc + curr.price * curr.qty, 0))
+         var xTotal= cart.reduce((acc,curr) => acc + curr.price * curr.qty, 0);
+        setTotal(xTotal);
+
       },[cart])
 
      
@@ -45,7 +57,8 @@ const Cart = () => {
                         </thead>
                         <tbody>
                         {cart.map ((item)=> 
-                          <CartItem item={item} key={item.id} removeFromCart={removeFromCart} updateCartItem={UpdateCartItemQty}></CartItem>
+                          // <CartItem item={item} key={item.id} removeFromCart={removeFromCart} updateCartItem={UpdateCartItemQty}></CartItem>
+                          <CartItem item={item} key={item.id}></CartItem>
                         )}
 
                           <tr>
@@ -55,13 +68,13 @@ const Cart = () => {
                           {cart.length > 0  && 
                             (
                             <div className="input-group btn-block">
-                              <button type="button" className="btn btn-danger mr-2" onClick={clearCart}><i className="la la-trash"></i>Clear Cart</button>
+                              <button type="button" className="btn btn-danger mr-2" onClick={() => dispatch(clearCart())}><i className="la la-trash"></i>Clear Cart</button>
                               <Link to="/checkout" className="btn btn-primary"><i className="la la-arrow-circle-right"></i>Check Out</Link>
                             </div>
                             )}
                           </td>
                           <td className="text-right"><strong>Cart Total:</strong></td>
-                          <td className="text-right"><strong>${total}</strong></td>
+                          <td className="text-right"><strong>${formatAmount(total)}</strong></td>
                             </tr>		
                         </tbody>
                       </table>

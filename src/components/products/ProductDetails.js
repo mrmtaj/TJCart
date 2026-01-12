@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import {useCart} from '../../context/CartContext';
-
+import { useDispatch } from "react-redux";
+import {addToCart} from '../../redux/cartSlice';
 
 const ProductDetails = () => {
 
     const {id} = useParams();
     const [product, setProduct] = useState(null);
-    const {addToCart} = useCart();
+    //const {addToCart} = useCart();
+	
+
+	const dispatch = useDispatch();
+
         
     useEffect(() => {
       
@@ -80,7 +85,7 @@ const ProductDetails = () => {
 					<hr/>
 					
 									
-					<button type="button" className="btn btn-primary btn-block btn-icon"  onClick={()=>addToCart(product)}> 
+					<button type="button" className="btn btn-primary btn-block btn-icon"  onClick={()=>dispatch(addToCart(product))}> 
 						 <i className="la la-cart-plus"></i> Add to cart
 					</button>
 

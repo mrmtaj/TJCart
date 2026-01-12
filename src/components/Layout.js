@@ -13,18 +13,17 @@ import Slider from './Slider';
 import { UserContext } from '../context/UserContext';
 
 import {AuthProvider} from '../context/AuthContext';
-import {CartProvider} from '../context/CartContext';
-import {ProductProvider} from '../context/ProductContext';
+
 
 import Alert from './commons/Alert';
 
-import { useMemo, useReducer, useState } from 'react';
-// //import { createStore } from 'redux';
-// import {legacy_createStore as createStore} from 'redux'
-// import { Provider } from 'react-redux';
-// import counterReducer from '../redux/reducer';
+import { useMemo, useState } from 'react';
+ 
 
-import counterReducer from '../redux/reducer';
+ 
+import { Provider } from 'react-redux';
+import store from '../store';
+
 
 
 const Layout = () => {
@@ -33,42 +32,45 @@ const Layout = () => {
  const xpath = useLocation();
  const [user, setUser] = useState();
  const xUser= useMemo( ()=> ({user, setUser}),[user, setUser]);
- const [count, setCount] = useState(3);
 
- const [counter, counterDispatch] = useReducer(counterReducer, 8)
+
 
  const [alert, setAlert] = useState(null);
+
   const showAlert = (message, type)=>{
       setAlert({ msg: message,type: type })
       setTimeout(() => { setAlert(null);  }, 2500);
   }
 
-useEffect (()=>{
-},[count]);
 
- const CountClicked = () =>{
-  setCount(count+1);
- }
+  
+console.log('Initial State ', store.getState())
+const unsubscribe = store.subscribe(() => {
+  console.log('Updated State ', store.getState())
+})
+ 
 
   return (
         <>
-     
-        <UserContext.Provider value={{xUser, counter, counterDispatch}}>
+       <Provider store={store}>
+        <UserContext.Provider value={{xUser}}>
          <AuthProvider>
-            <CartProvider>
-                <ProductProvider>
-                      <TopNav  showAlert={showAlert}/>
-                      <Alert alert={alert}/>
-                      <Header count={count} CountClicked={CountClicked} showAlert={showAlert} />
-                      {xpath.pathname === "/" && <Slider/>} 
-                            <Outlet />
-                      {xpath.pathname === "/" && <Parallax/>} 
-                      <Footer/>
-                  </ProductProvider>
-            </CartProvider>
+          
+     
+                              <TopNav  showAlert={showAlert}/>
+                              <Alert alert={alert}/>
+                              <Header showAlert={showAlert} />
+                              {xpath.pathname === "/" && <Slider/>} 
+                                    <Outlet />
+                              {xpath.pathname === "/" && <Parallax/>} 
+                              <Footer/>
+                       
+              
+           
           </AuthProvider>
 
           </UserContext.Provider>
+          </Provider>
         </>
   )
 }

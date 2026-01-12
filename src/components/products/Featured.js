@@ -1,23 +1,53 @@
 import React, { useState, useEffect } from "react";
+
+import { useSelector, useDispatch } from "react-redux";
+import { fetchProducts, xIncrement } from "../../redux/productSlice";
 import ReactPaginate from 'react-paginate';
 
 import Product from "./Product";
 
 let items=[];
+
 const Featured = () => {
 
+const dispatch = useDispatch();
+//const [products, setProducts] = useState([]);
+//console.log("xincrement", xIncrement);
 
-const [products, setProducts] = useState([]);
+//const mcount =   useSelector(state =>  state.products.mcount);
+const products = useSelector(state =>  state.products);
+
+
+//console.log("porduct222",products);
         
-useEffect(() => {
-  fetch(`https://dummyjson.com/products`)
-  .then((response) => response.json())
-  .then((x) => { setProducts(x);  items=x.products})
- // .then( z=> {items= console.log(z)})
-  .catch((err) => { console.log(err.message);});
-},[]);
+// useEffect(() => {
+//   fetch(`https://dummyjson.com/products`)
+//   .then((response) => response.json())
+//   .then((x) => { setProducts(x);  items=x.products})
+//    .catch((err) => { console.log(err.message);});
+// },[]);
 
-//const items = products.products;
+//dispatch(fetchProducts());
+       
+useEffect(() => {
+	//dispatch(fetchProducts());
+	getdata();
+	
+	
+  },[]);
+
+ const getdata =  () => {
+	dispatch(fetchProducts())
+	.then ( response => { items = response.payload.products;} )
+ }
+  
+ 
+
+
+if (products.loading) {
+    return (<h1>Loading... </h1>);
+  }
+
   return (
     <>
     
@@ -49,7 +79,9 @@ useEffect(() => {
 		  
 		  </div>
 		  <div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-		    tab 2 panel
+		    tab 2 panel 
+			xcount = { products.mcount ? products.mcount: 9}  
+			<button className="btn btn-primary ml-4" type="button" onClick={()=> dispatch(xIncrement())}> Click To Increment</button>
 		  </div>
 		  
 		  <div className="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
@@ -91,6 +123,7 @@ function PaginatedItems({ itemsPerPage }) {
 	const [itemOffset, setItemOffset] = useState(0);
   	const endOffset = itemOffset + itemsPerPage;
 //	console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+
 	const currentItems = ( items !== null )  && items.slice(itemOffset, endOffset);
 	const pageCount = Math.ceil( items != null && items.length / itemsPerPage);
   

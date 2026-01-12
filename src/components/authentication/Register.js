@@ -10,7 +10,7 @@ const Register = () => {
         const name = target.name;
         setState({
             ...state,
-            [name]: value
+            name: value
         });
     }
 

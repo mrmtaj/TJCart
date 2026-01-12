@@ -84,13 +84,13 @@ const handleSignIn = async (e) =>{
                                       <div className="form-group row">
                                       <label htmlFor="inputEmail1" className="col-sm-2 col-form-label">Email</label>
                                       <div className="col-sm-10">
-                                          <input type="text" name="emailx" id="emailx" className="form-control" placeholder="Email" defaultValue='kminchelle' />
+                                          <input type="text" name="emailx" id="emailx" className="form-control" placeholder="Email" defaultValue='michaelw' />
                                       </div>
                                       </div>
                                       <div className="form-group row">
                                       <label htmlFor="inputPassword1" className="col-sm-2 col-form-label">Password</label>
                                       <div className="col-sm-10">
-                                          <input type="test" name="passwordx" id="passwordx" className="form-control" placeholder="Password" defaultValue={'0lelplR'} />
+                                          <input type="test" name="passwordx" id="passwordx" className="form-control" placeholder="Password" defaultValue={'michaelwpass'} />
                                       </div>
                                       </div>
                                       

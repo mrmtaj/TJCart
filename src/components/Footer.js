@@ -1,14 +1,19 @@
 
-import React from 'react'
+import React from 'react';
+import { useSelector } from 'react-redux';
+
 
 const Footer = () => {
+
+	/////////////////////////////////////////
+//	const mycount= useSelector(state => state).todo.value;
   return (
             
     <footer className="bg-faded text-muted py-5 mt-5">
 	  <div className="container">
 		<div className="row">
 				  <div className="col-sm-3">
-			  <h5>Information</h5>
+			  <h5>Information </h5>
 			  <ul className="list-unstyled">
 				  <li><a href="/">About Us</a></li>
 				  <li><a href="/">Delivery Information</a></li>

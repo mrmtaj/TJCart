@@ -1,41 +1,44 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams  } from "react-router-dom";
 
 import {UserContext} from '../context/UserContext';
 import {useAuth} from '../context/AuthContext';
 
 
-import {useCart} from '../context/CartContext';
-import {useProductFilter} from '../context/ProductContext';
+import { useSelector, useDispatch } from "react-redux";
 
-import { useSelector } from 'react-redux';
+import { formatAmount } from "../utilities/Helper";
 
 
-const Header = ({count, CountClicked, showAlert}) => {
+const Header = () => {
 
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  /////////////////////////////////////////
+ // const mycount= useSelector(state => state.todo.value);
+  //const dispatch = useDispatch();
 
-  const {user, setUser, counter, counterDispatch} = useContext(UserContext);
+  const {user, setUser} = useContext(UserContext);
 
 
   const {authUser, setAuthUser, setIsLoggedIn} = useAuth();
 
-  const {cart} = useCart();
+ // const {cart} = useCart();
+ const { cart } = useSelector(state => state.cart)
 
   const [srchterm, setSrchterm] = useState('');
-  const {productFilter : {sort, searchQry}, productFilterDispatch } = useProductFilter();
+  //const {productFilter : {sort, searchQry}, productFilterDispatch } = useProductFilter();
  
 
   const [categories, setCategories]= useState([]);
  
- const [total, setTotal] = useState();
+ const [total, setTotal] = useState(0);
+ const [totalquantity, setTotalquantity] = useState(0);
 
-
- 
- //console.log(counter); 
 
 useEffect(()=>{
-      setTotal(cart.reduce((acc,curr) => acc + curr.price * curr.qty, 0))
+      setTotalquantity(cart.reduce((acc,curr) => acc + curr.qty, 0));
+      setTotal(cart.reduce((acc,curr) => acc + curr.price * curr.qty, 0));
     },[cart])
 
   useEffect(() => {
@@ -54,20 +57,14 @@ const handleLogout = () => {
 
 }
 
-function clickme(){
-  showAlert("he am gere for you", 'success');
-  CountClicked();
-  counterDispatch({type: 'increment'})
-}
-
 
 function handleSearch(){
-	productFilterDispatch({
-		type: "SEARCH_BY_QRY",
-		payload: srchterm
-	  });
-
-    navigate('/products');
+	
+ 
+  if (srchterm != '') {
+    navigate(`/products?q=${encodeURIComponent(srchterm)}`);
+  } else  navigate(`/products`);
+    
 			
 }
 
@@ -82,8 +79,8 @@ function handleSearch(){
   <div className="col-md-3">
     <a href="/" className="logo">
       
-      <h1 className="text-dark"><i className="text-secondary la la-plug"></i><span>electr<span className="text-secondary">o.</span></span></h1>
-      <small className="text-dark">electronics shopping mall = {count}</small>
+      <h1 className="text-dark"><i className="text-secondary la la-shopping-cart"></i><span>Shop<span className="text-secondary">Guru</span></span></h1>
+      <small className="text-dark">Your online shopping stop</small>
       
     </a>
   </div>
@@ -91,22 +88,15 @@ function handleSearch(){
   <div className="col-md-5">
     
      <form className="">
-xxxxxxxxxxxxxxx  
-{counter !== null && counter}
+
  
       <div className="input-group input-group-lg mb-3" id="search-box" data-component-category>
         <input type="text" value={srchterm} onChange={(e)=> setSrchterm(e.target.value)}  className="form-control default-font-size" placeholder="Search product" aria-label="Search product" />
 
-        {/* <select className="custom-select input-group-append form-control-lg no-border-x default-font-size">
-              <option value="">All categories</option>
-              {categories != null && categories.map((x,index) => 
-              <option value={x} key={index}>{x}</option>
-              )}
-           </select> */}
+       
         
         <div className="input-group-append">
-          <button className="btn btn-primary" type="button" onClick={clickme}><i className="la la-search"></i></button>
-          <button className="btn btn-primary" type="button" onClick={handleSearch}><i className="la la-search"></i></button>
+                   <button className="btn btn-primary" type="button" onClick={handleSearch}><i className="la la-search"></i></button>
         </div>
       </div>
     </form>
@@ -117,13 +107,13 @@ xxxxxxxxxxxxxxx
     
     <div className="dropdown float-right" id="mini-cart">
       <Link className="btn btn-link dropdown-toggle bg-faded p-0 chevron-big" to="/cart" id="dropdownMenuLink"  aria-haspopup="true" aria-expanded="false">
-      <i className="la la-shopping-cart d-inline-block" style={{'fontSize': '42px' }}><span className="cart-items" data-total_items>{cart.length}</span></i>&ensp; <div className="d-inline-block text-dark"><span className="small d-block text-left">Your cart</span><span className="font-weight-bold" data-total>${total}</span></div>
+      <i className="la la-cart-plus d-inline-block" style={{'fontSize': '42px' }}><span className="cart-items" data-total_items>{totalquantity}</span></i>&ensp; <div className="d-inline-block text-dark"><span className="small d-block text-left">Your cart</span><span className="font-weight-bold" data-total>${formatAmount(total)}</span></div>
       </Link>
 
     </div>
     
     <div className="dropdown float-right" id="mini-user" data-component-user>
-      <a className="btn btn-link dropdown-toggle bg-faded p-0 chevron-big" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <a className="btn btn-link dropdown-toggle bg-faded p-0 chevron-big"  id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <i className="la la-user d-inline-block" style={{'fontSize': '42px' }}></i>&ensp; 
       
       <div className="d-inline-block text-dark" data-if="login">
@@ -155,10 +145,10 @@ xxxxxxxxxxxxxxx
         <ul className="navbar-nav mr-auto">
 
           <li className="nav-item dropdown categories-dropdown">
-            <a className="nav-link dropdown-toggle" href="http://example.com" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="la la-bars"></i>&ensp;Categories <i className="la la-angle-down float-right"></i></a>
+            <a className="nav-link dropdown-toggle" href="/" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="la la-bars"></i>&ensp;Categories <i className="la la-angle-down float-right"></i></a>
             <div className="dropdown-menu" aria-labelledby="dropdown04">
-              {categories != null && categories.map((x,index) => 
-                 <Link className="dropdown-item" to={`products/${x}`} key={index}>{x}</Link>
+              {categories !== null && categories.map((x,index) => 
+                 <Link className="dropdown-item" to={`products/${x.slug}`} key={index}>{x.slug}</Link>
               )}
             </div>
           </li>
@@ -166,32 +156,25 @@ xxxxxxxxxxxxxxx
 
 
           <li className="nav-item active">
-            <a className="nav-link" href="/featured">Home <span className="sr-only">(current)</span></a>
+            <Link className="nav-link" to="/featured">Featured <span className="sr-only">(current)</span></Link>
           </li>
 
+{/* 
+          <li className="nav-item">
+            <Link className="nav-link" href="/products">Delivery Services</Link>
+          </li> */}
 
           <li className="nav-item">
-            <a className="nav-link" href="/products">Delivery Services</a>
+            <Link className="nav-link" to="/categories">Categories</Link>
           </li>
 
           <li className="nav-item">
-            <a className="nav-link" href="/categories">Blog</a>
+            <Link className="nav-link" to="/">Support</Link>
           </li>
 
+         
           <li className="nav-item">
-            <a className="nav-link" href="/">Support</a>
-          </li>
-
-          <li className="nav-item dropdown">
-            <a className="nav-link dropdown-toggle" href="http://example.com" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">About Us</a>
-            <div className="dropdown-menu" aria-labelledby="dropdown04">
-              <a className="dropdown-item" href="/">FAQ</a>
-              <a className="dropdown-item" href="/">Our Story</a>
-              <a className="dropdown-item" href="/">Something else here</a>
-            </div>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="/">Contact Us</a>
+            <Link className="nav-link" to="/">Contact Us</Link>
           </li>
         </ul>
       </div>

@@ -1,13 +1,18 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-import {useCart} from '../../context/CartContext';
+//import {useCart} from '../../context/CartContext';
+
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../../redux/cartSlice';
 
 
 
 const Product = ({prod}) => {
 
-const {addToCart} = useCart();
+//const {addToCart} = useCart();
+const dispatch = useDispatch();
+
 
 
   return (
@@ -29,11 +34,11 @@ const {addToCart} = useCart();
              <Link to={`/productdetails/${prod.id}`}><img className="card-img-top img-fluid" src={prod.thumbnail}  alt={prod.title} /></Link>
             <div className="card-body">
             <h6 className="card-title">{prod.title}</h6>
-            {/* <p className="card-text">{prod.description}</p> */}
-            
+            {/* {<p className="card-text">{prod.description}</p> } */}
+            <span className="currency">$</span> <span>{prod.price}</span>
             </div>
             <div className="card-footer">
-            <button type="button" className="btn btn-sm btn-secondary btn-block mt-auto" title="Add to Cart" onClick={()=>addToCart(prod)}>
+            <button type="button" className="btn btn-sm btn-secondary btn-block mt-auto" title="Add to Cart" onClick={()=>dispatch(addToCart(prod))}>
                           <i className="fa fa-shopping-cart"></i> Add to Cart
                   </button>
             </div>
