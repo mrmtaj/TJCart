@@ -22,7 +22,6 @@ const Categories = () => {
     async function getData() {
       const response = await fetch(`https://dummyjson.com/products/categories`)
       let actualData = await response.json();
-      console.log(actualData)
       setCategories(actualData)
     }
     getData()
@@ -43,8 +42,8 @@ const Categories = () => {
         <div className="row">
           <div className="col-12">
 
-            {categories != null && categories.map(x =>
-              <Link to={`/products/${x.slug}`} className="breadcrumb-item">{x.name}</Link>
+            {categories != null && categories.map((x, index) =>
+              <Link to={`/products/${x.slug}`} className="breadcrumb-item" key={index}>{x.name}</Link>
             )}
 
           </div>
