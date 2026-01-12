@@ -40,9 +40,9 @@ const Footer = () => {
 			</ul>
 		  </div>
 		</div>
-			<p className="float-right">
+			{/* <p className="float-right">
 			  <a href="/">Back to top</a>
-			</p>
+			</p> */}
 	  </div>
 	</footer>
   )
